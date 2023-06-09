@@ -1,0 +1,3 @@
+client/tmp/*
+server/tmp/*
+auth_server/tmp/*
