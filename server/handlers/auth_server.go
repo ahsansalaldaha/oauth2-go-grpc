@@ -29,6 +29,7 @@ type AuthServer struct {
 // Authenticate - utilize to authenticate
 func (s *AuthServer) Authenticate(ctx context.Context, req *proto.AuthRequest) (*proto.AuthResponse, error) {
 
+	logrus.Info("Authenticate - Server called")
 	// Initialize your OAuth2 provider configuration
 	conf := &oauth2.Config{
 		ClientID:     req.ClientId,
@@ -38,12 +39,18 @@ func (s *AuthServer) Authenticate(ctx context.Context, req *proto.AuthRequest) (
 		},
 		RedirectURL: req.RedirectUri,
 	}
+	logrus.Info(conf)
+	logrus.Info("Token exchange called")
+
+	logrus.Info("Req Code:", req.Code)
 
 	// Exchange the authorization code for an access token
 	token, err := conf.Exchange(ctx, req.Code)
 	if err != nil {
 		return nil, err
 	}
+
+	logrus.Info("Token exchange responded")
 
 	// Return the token data in the response
 	return &proto.AuthResponse{

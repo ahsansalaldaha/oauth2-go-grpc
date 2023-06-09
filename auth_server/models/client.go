@@ -13,9 +13,9 @@ type GrantType byte
 
 const (
 	// Code - grand type having codes
-	Code GrantType = iota
+	Code GrantType = 1
 	// Implicit - grand type with username password
-	Implicit
+	Implicit GrantType = 2
 )
 
 // Client - client model for client database table
@@ -60,7 +60,7 @@ func (cm *ClientModel) GenerateClient(grantType GrantType, redirect []string) (*
 	validate := validator.New()
 	err := validate.Struct(client)
 	if err != nil {
-		return nil, fmt.Errorf("validation Error")
+		return nil, fmt.Errorf("validation Error: ", err)
 	}
 
 	result := cm.db.Create(&client)

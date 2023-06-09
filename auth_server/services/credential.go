@@ -4,6 +4,7 @@ import (
 	"invento/oauth/auth_server/models"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,8 +16,9 @@ type CredentialService struct {
 
 // ValidateClientAndSecret - validates for the client and secret specified are correct
 func (credSVC *CredentialService) ValidateClientAndSecret(clientID string, secret string) bool {
+	logrus.Info("ValidateClientAndSecret: ", clientID, secret)
 	res := credSVC.getRememberedClient(clientID)
-	if res != nil && res == secret {
+	if res != nil && res.(models.Client).Secret == secret {
 		return true
 	}
 	return false
@@ -28,7 +30,7 @@ func (credSVC *CredentialService) getRememberedClient(clientID string) interface
 		if err := credSVC.dbSVC.DB.Where("client_id = ?", clientID).Preload("Redirects").First(&client).Error; err != nil {
 			return nil
 		}
-		return client.Secret
+		return client
 	})
 }
 

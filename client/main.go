@@ -26,14 +26,16 @@ func ImplementImplicitGrant() {
 		log.Fatalf("Failed to connect: %v", err)
 	}
 	defer conn.Close()
+	ClientID := "cd1566a3-47ce-4b49-b2d1-0359c0b85fd9"
+	ClientSecret := "85b1face-6593-41c8-89f5-1216788ee003"
 
 	client := proto.NewAuthServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	req := &proto.AuthImplicitRequest{
-		ClientId:     "81b883b5-a272-4702-88d4-03a6d76c78fc",
-		ClientSecret: "4dcce6f9-6b60-4ad3-92db-f43a255f2cd0",
+		ClientId:     ClientID,
+		ClientSecret: ClientSecret,
 		Username:     "ali6",
 		Password:     "123456",
 	}
@@ -49,8 +51,8 @@ func ImplementImplicitGrant() {
 
 	fmt.Printf("Validating token now\n")
 	valResp, err := client.ValidateToken(ctx, &proto.ValidateTokenRequest{
-		ClientId:     "81b883b5-a272-4702-88d4-03a6d76c78fc",
-		ClientSecret: "4dcce6f9-6b60-4ad3-92db-f43a255f2cd0",
+		ClientId:     ClientID,
+		ClientSecret: ClientSecret,
 		Token:        resp.AccessToken,
 	})
 
@@ -69,8 +71,8 @@ func CodeBasedAuthorization() {
 	http.HandleFunc("/oauth2/callback", callbackHandler)
 	go http.ListenAndServe(":3000", nil)
 
-	const ClientID = "81b883b5-a272-4702-88d4-03a6d76c78fc"
-	const ClientSecret = "4dcce6f9-6b60-4ad3-92db-f43a255f2cd0"
+	const ClientID = "90585d3f-c5a3-4302-ae81-134e7a449f69"
+	const ClientSecret = "e00c0119-37aa-44ed-a8bf-9b0c2e9917c3"
 
 	// Open the authorization URL in the user's browser
 	authorizationURL := "http://0.0.0.0:8099/authorize" +

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"invento/oauth/auth_server/services"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 )
 
 // AuthorizeHandler - authorizes the request
@@ -15,7 +17,7 @@ func AuthorizeHandler(rs *services.RedisService, credSVC *services.CredentialSer
 		redirectURI := r.URL.Query().Get("redirect_uri")
 
 		if !credSVC.ValidateClientID(clientID) || !credSVC.ValidateRedirectURI(clientID, redirectURI) {
-			http.Error(w, "Invalid request", http.StatusBadRequest)
+			http.Error(w, "Invalid request"+" : "+"Client Or Redirect Issue", http.StatusBadRequest)
 			return
 		}
 
@@ -32,6 +34,7 @@ func AuthorizeHandler(rs *services.RedisService, credSVC *services.CredentialSer
 				// Generate an authorization code
 				cs := services.NewCodeService(rs)
 				code := cs.Get()
+				logrus.Info("code found: code ", code)
 				// Redirect the user back to the client application with the authorization code
 				http.Redirect(w, r, fmt.Sprintf("%s?code=%s", redirectURI, code), http.StatusFound)
 			}

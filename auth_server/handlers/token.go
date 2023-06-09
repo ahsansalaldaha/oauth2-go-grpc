@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
 
@@ -34,16 +35,21 @@ func TokenHandler(rs *services.RedisService, credSVC *services.CredentialService
 			return
 		}
 
+		logrus.Info("Grant Type: ", grantType)
 		if grantType == "authorization_code" {
 			code := r.FormValue("code")
+			logrus.Info("Code: ", code)
 			err = validate.Var(code, "required")
 			if err != nil {
 				http.Error(w, "'code' field is required", http.StatusBadRequest)
 				return
 			}
 			cs := services.NewCodeService(rs)
+			logrus.Info("credSVC.ValidateClientAndSecret", credSVC.ValidateClientAndSecret(clientID, clientSecret))
+			logrus.Info("cs.Verify(code)", cs.Verify(code))
 			// You'll need to implement your own validation logic here
 			if !credSVC.ValidateClientAndSecret(clientID, clientSecret) || !cs.Verify(code) {
+				logrus.Info("Invalid request: authorization_code")
 				http.Error(w, "Invalid request", http.StatusBadRequest)
 				return
 			}

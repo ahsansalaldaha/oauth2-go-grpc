@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 // CodeService - for generation
@@ -22,10 +23,13 @@ func (cs *CodeService) Get() string {
 
 // Verify - verify generated code
 func (cs *CodeService) Verify(code string) bool {
+	logrus.Info("Code: ", code, ":Verify")
 	_, err := cs.rs.Get(code).Result()
 	if err == redis.Nil {
+		logrus.Info("Found Nil")
 		return false
 	}
+	logrus.Info("Found True")
 	return true
 }
 

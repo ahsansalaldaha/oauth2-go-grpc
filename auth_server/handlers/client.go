@@ -7,12 +7,14 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 )
 
 // HandleClientGeneration - Handles Client Generation
 func HandleClientGeneration(dbSVC *services.DBService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
+			logrus.Info("HandleClientGeneration Called")
 
 			typeValue := r.FormValue("grant_type")
 			redirects := r.Form["redirects"]
@@ -30,6 +32,7 @@ func HandleClientGeneration(dbSVC *services.DBService) func(w http.ResponseWrite
 				http.Error(w, "'redirects' field is required", http.StatusBadRequest)
 				return
 			}
+
 			var selectedGrantType models.GrantType
 			switch typeValue {
 			case "code":
@@ -40,6 +43,7 @@ func HandleClientGeneration(dbSVC *services.DBService) func(w http.ResponseWrite
 				selectedGrantType = models.Code
 			}
 
+			logrus.Info("SelectedGrantType:", selectedGrantType)
 			clientModel := models.NewClientModel(dbSVC.DB)
 			client, err := clientModel.GenerateClient(selectedGrantType, redirects)
 			if err != nil {
