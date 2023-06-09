@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "invento/oauth/auth_server/common/proto";
+
+service AuthService {
+  rpc Authenticate (AuthRequest) returns (AuthResponse) {}
+  rpc AuthenticateImplicit (AuthImplicitRequest) returns (AuthResponse) {}
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse) {}
+}
+message AuthImplicitRequest {
+  string client_id = 1;
+  string client_secret = 2;
+  string username = 3;
+  string password = 4;
+}
+
+message AuthRequest {
+  string client_id = 1;
+  string client_secret = 2;
+  string code = 3;
+  string redirect_uri = 4;
+  string grant_type = 5;
+}
+
+message AuthResponse {
+  string access_token = 1;
+  string token_type = 2;
+  int32 expires_in = 3;
+  string refresh_token = 4;
+  string scope = 5;
+}
+
+
+message ValidateTokenRequest {
+  string client_id = 1;
+  string client_secret = 2;
+  string token = 3;
+}
+
+message ValidateTokenResponse {
+  bool active = 1;
+}

@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: dev.Dockerfile
+    restart: always
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./server:/app
+
+  client:
+    build:
+      context: ./client
+      dockerfile: dev.Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+
+  auth-server:
+    build:
+      context: ./auth_server
+      dockerfile: dev.Dockerfile
+    restart: always
+    ports:
+      - "8099:8099"
+    volumes:
+      - ./auth_server:/app
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres/oauth?sslmode=disable
+    depends_on:
+      - cache
+
+  cache:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: oauth
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
+  redis-data:
