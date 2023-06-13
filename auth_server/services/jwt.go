@@ -3,6 +3,7 @@ package services
 import (
 	"crypto/rsa"
 	"fmt"
+	"invento/oauth/auth_server/utils"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -11,8 +12,8 @@ import (
 // GenerateJWTTokens - generates JWT token
 func GenerateJWTTokens(privateKey *rsa.PrivateKey) (string, string, error) {
 	// Set token expiration times
-	accessTokenExp := time.Now().Add(15 * time.Minute)
-	refreshTokenExp := time.Now().Add(24 * time.Hour)
+	accessTokenExp := time.Now().Add(utils.AccessTokenExpCache)
+	refreshTokenExp := time.Now().Add(utils.RefreshTokenExpCache)
 
 	// Create the access token
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.StandardClaims{

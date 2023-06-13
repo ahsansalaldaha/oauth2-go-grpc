@@ -11,6 +11,7 @@ import (
 // User - User models
 type User struct {
 	gorm.Model
+	Name     string `validate:"required"`
 	Username string `gorm:"unique" validate:"required"`
 	Password string `validate:"required"`
 }
@@ -28,14 +29,14 @@ func NewUserModel(db *gorm.DB) *UserModel {
 }
 
 // GenerateUser - Generates User of certain type
-func (cm *UserModel) GenerateUser(username string, password string) (*User, error) {
+func (cm *UserModel) GenerateUser(name string, username string, password string) (*User, error) {
 
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		panic("Failed to hash password")
 	}
 
-	user := User{Username: username, Password: hashedPassword}
+	user := User{Name: name, Username: username, Password: hashedPassword}
 
 	validate := validator.New()
 	err = validate.Struct(user)

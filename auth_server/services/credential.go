@@ -2,7 +2,7 @@ package services
 
 import (
 	"invento/oauth/auth_server/models"
-	"time"
+	"invento/oauth/auth_server/utils"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -25,7 +25,7 @@ func (credSVC *CredentialService) ValidateClientAndSecret(clientID string, secre
 }
 
 func (credSVC *CredentialService) getRememberedClient(clientID string) interface{} {
-	return credSVC.redisSVC.Remember(clientID, 1*time.Hour, func() interface{} {
+	return credSVC.redisSVC.Remember(clientID, utils.CredsClientCache, func() interface{} {
 		var client models.Client
 		if err := credSVC.dbSVC.DB.Where("client_id = ?", clientID).Preload("Redirects").First(&client).Error; err != nil {
 			return nil

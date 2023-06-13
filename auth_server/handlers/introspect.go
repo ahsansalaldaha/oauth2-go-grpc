@@ -20,7 +20,7 @@ func TokenIntrospectHandler(rs *services.RedisService) func(w http.ResponseWrite
 		if r.Method == http.MethodPost {
 			// Retrieve a single parameter using FormValue
 			tokenString := r.FormValue("token")
-			fmt.Println("token:", tokenString)
+			logrus.Println("token:", tokenString)
 			// Check if the token is cached in Redis
 			_, err := rs.Get(tokenString).Result()
 

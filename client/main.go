@@ -39,17 +39,18 @@ func ImplementImplicitGrant() {
 		Username:     "ali6",
 		Password:     "123456",
 	}
+
 	resp, err := client.AuthenticateImplicit(ctx, req)
 	if err != nil {
 		log.Fatalf("Failed to authenticate: %v", err)
 	}
-	fmt.Printf("Access Token: %s\n", resp.AccessToken)
-	fmt.Printf("Token Type: %s\n", resp.TokenType)
-	fmt.Printf("Expires In: %d\n", resp.ExpiresIn)
-	fmt.Printf("Refresh Token: %s\n", resp.RefreshToken)
-	fmt.Printf("Scope: %s\n", resp.Scope)
+	logrus.Printf("Access Token: %s\n", resp.AccessToken)
+	logrus.Printf("Token Type: %s\n", resp.TokenType)
+	logrus.Printf("Expires In: %d\n", resp.ExpiresIn)
+	logrus.Printf("Refresh Token: %s\n", resp.RefreshToken)
+	logrus.Printf("Scope: %s\n", resp.Scope)
 
-	fmt.Printf("Validating token now\n")
+	logrus.Printf("Validating token now\n")
 	valResp, err := client.ValidateToken(ctx, &proto.ValidateTokenRequest{
 		ClientId:     ClientID,
 		ClientSecret: ClientSecret,
@@ -77,7 +78,7 @@ func CodeBasedAuthorization() {
 	// Open the authorization URL in the user's browser
 	authorizationURL := "http://0.0.0.0:8099/authorize" +
 		"?response_type=code&client_id=" + ClientID + "&redirect_uri=http://0.0.0.0:3000/oauth2/callback&scope=basic"
-	fmt.Printf("Open this URL in your browser to authorize the application:\n%s\n", authorizationURL)
+	logrus.Printf("Open this URL in your browser to authorize the application:\n%s\n", authorizationURL)
 
 	// Wait for the authorization code to be received by the HTTP server
 	authCode := <-authCodeChan
@@ -102,14 +103,14 @@ func CodeBasedAuthorization() {
 	}
 	resp, err := client.Authenticate(ctx, req)
 	if err != nil {
-		log.Fatalf("Failed to authenticate: %v", err)
+		logrus.Fatalf("Failed to authenticate: %v", err)
 	}
 
-	fmt.Printf("Access Token: %s\n", resp.AccessToken)
-	fmt.Printf("Token Type: %s\n", resp.TokenType)
-	fmt.Printf("Expires In: %d\n", resp.ExpiresIn)
-	fmt.Printf("Refresh Token: %s\n", resp.RefreshToken)
-	fmt.Printf("Scope: %s\n", resp.Scope)
+	logrus.Printf("Access Token: %s\n", resp.AccessToken)
+	logrus.Printf("Token Type: %s\n", resp.TokenType)
+	logrus.Printf("Expires In: %d\n", resp.ExpiresIn)
+	logrus.Printf("Refresh Token: %s\n", resp.RefreshToken)
+	logrus.Printf("Scope: %s\n", resp.Scope)
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {

@@ -24,7 +24,7 @@ func main() {
 	dbSVC.DB.AutoMigrate(&models.User{}, &models.Client{}, &models.Redirect{}, &models.Config{})
 
 	http.HandleFunc("/client", handlers.HandleClientGeneration(dbSVC))
-	http.HandleFunc("/user", handlers.HandleUserGeneration(dbSVC))
+	http.HandleFunc("/user", handlers.HandleUserGeneration(redisService, dbSVC))
 	http.HandleFunc("/token", handlers.TokenHandler(redisService, credSVC))
 	http.HandleFunc("/authorize", handlers.AuthorizeHandler(redisService, credSVC))
 	http.HandleFunc("/introspect", handlers.TokenIntrospectHandler(redisService))

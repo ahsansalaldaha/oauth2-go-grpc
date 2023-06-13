@@ -1,6 +1,7 @@
 package services
 
 import (
+	"invento/oauth/auth_server/utils"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -37,6 +38,6 @@ func (cs *CodeService) Verify(code string) bool {
 func NewCodeService(rs *RedisService) *CodeService {
 	return &CodeService{
 		rs:       rs,
-		validity: 24 * time.Hour,
+		validity: utils.CodeExpiryTime,
 	}
 }

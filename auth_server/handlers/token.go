@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"invento/oauth/auth_server/services"
+	"invento/oauth/auth_server/utils"
 	"net/http"
 	"time"
 
@@ -71,7 +72,7 @@ func TokenHandler(rs *services.RedisService, credSVC *services.CredentialService
 		resp := &oauth2.Token{
 			AccessToken:  accessToken,
 			TokenType:    "Bearer",
-			Expiry:       time.Now().Add(1 * time.Hour),
+			Expiry:       time.Now().Add(utils.JWTAuthTokenExpiryTime),
 			RefreshToken: refreshToken,
 		}
 
