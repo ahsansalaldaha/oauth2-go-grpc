@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"invento/oauth/auth_server/utils"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -14,6 +15,7 @@ type User struct {
 	Name     string `validate:"required"`
 	Username string `gorm:"unique" validate:"required"`
 	Password string `validate:"required"`
+	Lock     *[]UserLock
 }
 
 // UserModel - User model to generate clients
@@ -52,4 +54,17 @@ func (cm *UserModel) GenerateUser(name string, username string, password string)
 
 	return &user, nil
 
+}
+
+// UserLock - User Lock Model models
+type UserLock struct {
+	gorm.Model
+	UserRelation
+	LockedAt time.Time
+}
+
+// UserRelation - represents the user relationship
+type UserRelation struct {
+	UserID uint  `json:"user_id" validate:"required"`
+	User   *User `json:"user"`
 }

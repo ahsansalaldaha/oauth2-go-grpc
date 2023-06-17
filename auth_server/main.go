@@ -19,9 +19,10 @@ func main() {
 
 	redisService := services.NewRedisService(context.Background())
 	dbSVC := services.NewDBService()
-	credSVC := services.NewCredentialService(dbSVC, redisService)
+	queueSVC := services.NewQueueService()
+	credSVC := services.NewCredentialService(dbSVC, redisService, queueSVC)
 
-	dbSVC.DB.AutoMigrate(&models.User{}, &models.Client{}, &models.Redirect{}, &models.Config{})
+	dbSVC.DB.AutoMigrate(&models.User{}, &models.Client{}, &models.Redirect{}, &models.Config{}, &models.UserLock{})
 
 	http.HandleFunc("/client", handlers.HandleClientGeneration(dbSVC))
 	http.HandleFunc("/user", handlers.HandleUserGeneration(redisService, dbSVC))

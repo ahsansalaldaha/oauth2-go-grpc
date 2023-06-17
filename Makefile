@@ -9,6 +9,7 @@ dep-install: ## Build and run server.
 	cd auth_server && go mod tidy && cd ..
 	cd server && go mod tidy && cd ..
 	cd client && go mod tidy && cd ..
+	cd logger && go mod tidy && cd ..
 
 
 .PHONY: serve

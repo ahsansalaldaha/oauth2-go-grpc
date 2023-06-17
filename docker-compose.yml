@@ -10,6 +10,8 @@ services:
       - "50051:50051"
     volumes:
       - ./server:/app
+    depends_on:
+    - auth-server
 
   client:
     build:
@@ -20,6 +22,8 @@ services:
       - "3000:3000"
     volumes:
       - ./client:/app
+    depends_on:
+    - server
 
   auth-server:
     build:
@@ -32,8 +36,32 @@ services:
       - ./auth_server:/app
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres/oauth?sslmode=disable
+      QUEUE_URL: amqp://guest:guest@queue:5672/
     depends_on:
       - cache
+      - postgres
+      - queue
+  
+  logger:
+    build:
+      context: ./logger
+      dockerfile: dev.Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logger:/app
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres/oauth?sslmode=disable
+      QUEUE_URL: amqp://guest:guest@queue:5672/
+      MAILER_HOST: mailhog
+      MAILER_PORT: 1025
+      MAILER_USERNAME: ""
+      MAILER_PASSWORD: ""
+    depends_on:
+      - postgres
+      - queue
+      - mailhog
 
   cache:
     image: redis:alpine
@@ -65,6 +93,26 @@ services:
       timeout: 5s
       retries: 5
 
+  queue:
+    image: rabbitmq:3.9.9-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+  
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025  # SMTP port
+      - 8025:8025  # MailHog web interface port
+
+
 volumes:
   postgres-data:
   redis-data:
+  rabbitmq-data:
+    driver: local

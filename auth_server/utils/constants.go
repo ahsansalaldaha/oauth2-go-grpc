@@ -15,4 +15,6 @@ const (
 	AccessTokenExpCache = 15 * time.Minute
 	// RefreshTokenExpCache - represents refresh token expiry cache time
 	RefreshTokenExpCache = 24 * time.Minute
+	// UserIncorrectLoginCount - represents the Number of Incorrect user login count before marking it to be locked
+	UserIncorrectLoginCount = 3
 )

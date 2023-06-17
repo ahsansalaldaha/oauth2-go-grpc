@@ -14,9 +14,9 @@ import (
 
 func main() {
 	// Remove this to un implement implicit grant
-	// ImplementImplicitGrant()
+	ImplementImplicitGrant()
 
-	CodeBasedAuthorization()
+	// CodeBasedAuthorization()
 }
 
 // ImplementImplicitGrant - implementation of oauth package
@@ -36,8 +36,8 @@ func ImplementImplicitGrant() {
 	req := &proto.AuthImplicitRequest{
 		ClientId:     ClientID,
 		ClientSecret: ClientSecret,
-		Username:     "ali6",
-		Password:     "123456",
+		Username:     "ali14",
+		Password:     "Aa#12345678",
 	}
 
 	resp, err := client.AuthenticateImplicit(ctx, req)

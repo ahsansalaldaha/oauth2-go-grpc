@@ -55,7 +55,10 @@ func TokenHandler(rs *services.RedisService, credSVC *services.CredentialService
 				return
 			}
 		} else if grantType == "password" {
-			if !credSVC.ValidateClientAndSecret(clientID, clientSecret) {
+			username := r.FormValue("username")
+			password := r.FormValue("password")
+
+			if !credSVC.ValidateClientAndSecret(clientID, clientSecret) || !credSVC.ValidateUserCredentials(username, password) {
 				http.Error(w, "Invalid request", http.StatusBadRequest)
 				return
 			}
