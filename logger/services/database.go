@@ -3,7 +3,7 @@ package services
 import (
 	"os"
 
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -14,9 +14,8 @@ type DBService struct {
 
 // NewDBService - Generates Database Service
 func NewDBService() *DBService {
-	dbInstance, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  os.Getenv("DATABASE_URL"),
-		PreferSimpleProtocol: true, // disables implicit prepared statement usage
+	dbInstance, err := gorm.Open(mysql.New(mysql.Config{
+		DSN: os.Getenv("DATABASE_URL"),
 	}), &gorm.Config{})
 
 	if err != nil {

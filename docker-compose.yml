@@ -35,11 +35,11 @@ services:
     volumes:
       - ./auth_server:/app
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres/oauth?sslmode=disable
+      DATABASE_URL: oauth_user:secret@tcp(database:3306)/oauth?charset=utf8mb4&parseTime=True&loc=Local
       QUEUE_URL: amqp://guest:guest@queue:5672/
     depends_on:
       - cache
-      - postgres
+      - database
       - queue
   
   logger:
@@ -52,14 +52,14 @@ services:
     volumes:
       - ./logger:/app
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres/oauth?sslmode=disable
+      DATABASE_URL: oauth_user:secret@tcp(database:3306)/oauth?charset=utf8mb4&parseTime=True&loc=Local
       QUEUE_URL: amqp://guest:guest@queue:5672/
       MAILER_HOST: mailhog
       MAILER_PORT: 1025
       MAILER_USERNAME: ""
       MAILER_PASSWORD: ""
     depends_on:
-      - postgres
+      - database
       - queue
       - mailhog
 
@@ -76,22 +76,26 @@ services:
       timeout: 5s
       retries: 5
 
-  postgres:
-    image: postgres
+  database:
+    image: mysql:8.0
+    platform: linux/x86_64
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: oauth
-    ports:
-      - "5432:5432"
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: oauth
+      MYSQL_USER: oauth_user
+      MYSQL_PASSWORD: secret
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+    command: ['--default-authentication-plugin=mysql_native_password']
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - database-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 3
+
 
   queue:
     image: rabbitmq:3.9.9-management-alpine
@@ -112,7 +116,7 @@ services:
 
 
 volumes:
-  postgres-data:
+  database-data:
   redis-data:
   rabbitmq-data:
     driver: local

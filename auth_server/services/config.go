@@ -24,10 +24,15 @@ func NewConfigService(db *gorm.DB, redisSVC *RedisService) *ConfigService {
 	}
 }
 
+// GetDatabaseService - returns the database service assigned in config service
+func (configSVC *ConfigService) GetDatabaseService() *gorm.DB {
+	return configSVC.db
+}
+
 // GetFromDB -  get config from the database
 func (configSVC *ConfigService) GetFromDB(key string) *models.Config {
 	var config models.Config
-	if err := configSVC.db.Where("key = ?", key).First(&config).Error; err != nil {
+	if err := configSVC.db.Where("`key` = ?", key).First(&config).Error; err != nil {
 		logrus.Infof("Error found in get from db: ", err)
 		return nil
 	}
@@ -135,4 +140,10 @@ func (configSVC *ConfigService) StoreUtmostComplexity() {
 	configSVC.FindOrCreate("password-complexity-should-have-lower", true)
 	configSVC.FindOrCreate("password-complexity-should-have-numeric", true)
 	configSVC.FindOrCreate("password-complexity-should-have-special", true)
+}
+
+// StoreDefaultConfigs - Stores Default Configs
+func (configSVC *ConfigService) StoreDefaultConfigs() {
+	configSVC.StoreUtmostComplexity()
+	configSVC.FindOrCreate("enable-login-activity-logging", true)
 }

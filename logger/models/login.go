@@ -9,9 +9,9 @@ import (
 // User - Represents User Model
 type User struct {
 	gorm.Model
-	Name     string
-	Username string
-	Password string
+	Name     string `gorm:"size:255"`
+	Username string `gorm:"size:255"`
+	Password string `gorm:"size:255"`
 }
 
 // LogMessage - Represents Logs Message

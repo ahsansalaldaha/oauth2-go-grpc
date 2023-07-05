@@ -79,7 +79,7 @@ func MSGHandler(dbService *services.DBService, mailService *services.EmailServic
 		email.SetHeader("From", "ahsan@geekinn.co")
 		email.SetHeader("To", "abc@invento.sa")
 		email.SetHeader("Subject", "Login")
-		email.SetBody("text/plain", fmt.Sprintf("This is to notify that %s tried to attend %s", logMessage.User.Name, logMessage.AttemptAt))
+		email.SetBody("text/plain", fmt.Sprintf("This is to notify that %s tried to access %s", logMessage.User.Name, logMessage.AttemptAt))
 
 		mailService.Send(email)
 	}

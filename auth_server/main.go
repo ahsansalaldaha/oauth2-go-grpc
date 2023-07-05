@@ -20,12 +20,16 @@ func main() {
 	redisService := services.NewRedisService(context.Background())
 	dbSVC := services.NewDBService()
 	queueSVC := services.NewQueueService()
-	credSVC := services.NewCredentialService(dbSVC, redisService, queueSVC)
+
+	cs := services.NewConfigService(dbSVC.DB, redisService)
+	cs.StoreDefaultConfigs()
+
+	credSVC := services.NewCredentialService(dbSVC, redisService, queueSVC, cs)
 
 	dbSVC.DB.AutoMigrate(&models.User{}, &models.Client{}, &models.Redirect{}, &models.Config{}, &models.UserLock{})
 
 	http.HandleFunc("/client", handlers.HandleClientGeneration(dbSVC))
-	http.HandleFunc("/user", handlers.HandleUserGeneration(redisService, dbSVC))
+	http.HandleFunc("/user", handlers.HandleUserGeneration(dbSVC, cs))
 	http.HandleFunc("/token", handlers.TokenHandler(redisService, credSVC))
 	http.HandleFunc("/authorize", handlers.AuthorizeHandler(redisService, credSVC))
 	http.HandleFunc("/introspect", handlers.TokenIntrospectHandler(redisService))

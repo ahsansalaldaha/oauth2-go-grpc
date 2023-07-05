@@ -14,6 +14,7 @@ type CredentialService struct {
 	dbSVC     *DBService
 	redisSVC  *RedisService
 	queueSVC  *QueueService
+	configSVC *ConfigService
 	lockCount map[string]int
 }
 
@@ -48,6 +49,13 @@ func (credSVC *CredentialService) ValidateClientID(clientID string) bool {
 
 // ValidateUserCredentials - validates for the username and password specified are correct
 func (credSVC *CredentialService) ValidateUserCredentials(username string, password string) bool {
+
+	enableLoginActivityLogging := true
+	ok := false
+	if enableLoginActivityLogging, ok = credSVC.configSVC.GetBool("enable-login-activity-logging"); ok != true {
+		enableLoginActivityLogging = true
+	}
+
 	logrus.Info("username: ", username)
 	logrus.Info("password: ", password)
 	var user models.User
@@ -68,20 +76,27 @@ func (credSVC *CredentialService) ValidateUserCredentials(username string, passw
 			credSVC.lockCount[username] = 0
 		}
 		logrus.Infof("Sending False: User found: %v", user)
-		credSVC.queueSVC.ProduceMsg(LogMessage{
-			User:      user,
-			AttemptAt: time.Now(),
-			Success:   false,
-		})
+
+		if enableLoginActivityLogging {
+			credSVC.queueSVC.ProduceMsg(LogMessage{
+				User:      user,
+				AttemptAt: time.Now(),
+				Success:   false,
+			})
+		}
+
 	} else {
 		logrus.Info("User/Password found")
 		credSVC.lockCount[username] = 0
 		logrus.Infof("Sending True: User found: %v", user)
-		credSVC.queueSVC.ProduceMsg(LogMessage{
-			User:      user,
-			AttemptAt: time.Now(),
-			Success:   true,
-		})
+		if enableLoginActivityLogging {
+			credSVC.queueSVC.ProduceMsg(LogMessage{
+				User:      user,
+				AttemptAt: time.Now(),
+				Success:   true,
+			})
+		}
+
 	}
 
 	return err == nil
@@ -101,11 +116,12 @@ func (credSVC *CredentialService) ValidateRedirectURI(clientID string, redirectU
 }
 
 // NewCredentialService -
-func NewCredentialService(db *DBService, rs *RedisService, queue *QueueService) *CredentialService {
+func NewCredentialService(db *DBService, rs *RedisService, queue *QueueService, cs *ConfigService) *CredentialService {
 	return &CredentialService{
 		dbSVC:     db,
 		redisSVC:  rs,
 		queueSVC:  queue,
+		configSVC: cs,
 		lockCount: make(map[string]int),
 	}
 }

@@ -18,18 +18,13 @@ type UserValidationInput struct {
 }
 
 // HandleUserGeneration - Handles User Generation
-func HandleUserGeneration(rs *services.RedisService, dbSVC *services.DBService) func(w http.ResponseWriter, r *http.Request) {
+func HandleUserGeneration(dbSVC *services.DBService, cs *services.ConfigService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 
 			name := r.FormValue("name")
 			username := r.FormValue("username")
 			password := r.FormValue("password")
-
-			cs := services.NewConfigService(dbSVC.DB, rs)
-
-			// Stored password complexity temporarily
-			cs.StoreUtmostComplexity()
 
 			var passMinLength int
 			var err error

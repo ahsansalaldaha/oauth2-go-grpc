@@ -3,7 +3,8 @@ package services
 import (
 	"os"
 
-	"gorm.io/driver/postgres"
+	"github.com/sirupsen/logrus"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -14,10 +15,10 @@ type DBService struct {
 
 // NewDBService - Generates Database Service
 func NewDBService() *DBService {
-	dbInstance, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  os.Getenv("DATABASE_URL"),
-		PreferSimpleProtocol: true, // disables implicit prepared statement usage
-	}), &gorm.Config{})
+	logrus.Info(os.Getenv("DATABASE_URL"))
+	// dbInstance, err := gorm.Open(mysql.Open(os.Getenv("DATABASE_URL")), &gorm.Config{})
+	dsn := os.Getenv("DATABASE_URL")
+	dbInstance, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		panic("failed to connect database")
