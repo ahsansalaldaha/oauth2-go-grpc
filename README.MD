@@ -1,5 +1,6 @@
-## Authentication module/service features:
+## Golang oAuth2 using gRPC and Docker
 
+### Authentication module/service features:
 - [x] Set password complexity by admin (min. length, min. combination Aa$1-9, do not allow name in password)
 - [x] Change Postgres to MySQL
 - [x] Log all login events (success, failed) with key information like source IP, device, datetime,...
